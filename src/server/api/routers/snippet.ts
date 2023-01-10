@@ -13,11 +13,12 @@ export const snippetRouter = createTRPCRouter({
       });
     }),
   getTopThree: publicProcedure.query(({ ctx }) => {
+    // Use prisma to find the most recent three snippets
     return ctx.prisma.snippet.findMany({
-      take: 3,
       orderBy: {
         createdAt: "desc",
       },
+      take: 3,
     });
   }),
   create: publicProcedure

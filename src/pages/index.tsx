@@ -10,6 +10,7 @@ import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import ReactCodeMirror from "@uiw/react-codemirror";
 
 import { api, getBaseUrl } from "../utils/api";
+import CTAButton from "../components/CTAButton";
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -62,69 +63,67 @@ const Home: NextPage = () => {
             </h2>
           </div>
 
-          <ReactCodeMirror
-            value={value}
-            onChange={setValue}
-            width="85vw"
-            theme={vscodeDark}
-            extensions={[javascript({ jsx: true })]}
-            placeholder="// ---Paste your code here!---"
-            editable={!hasShared}
-          />
+          <div className="flex flex-col items-center justify-start gap-4">
+            <ReactCodeMirror
+              value={value}
+              onChange={setValue}
+              width="85vw"
+              theme={vscodeDark}
+              extensions={[javascript({ jsx: true })]}
+              placeholder="// ---Paste your code here!---"
+              editable={!hasShared}
+            />
 
-          {!hasShared ? (
-            <button
-              className="rounded-md bg-[hsl(280,100%,70%)]/90 px-6 py-3 text-3xl font-semibold tracking-tight text-white/90 hover:bg-purple-400 disabled:cursor-not-allowed disabled:bg-gray-400"
-              onClick={handleShare}
-              disabled={!value}
-            >
-              Share
-            </button>
-          ) : createSnippetMutation.isLoading ? (
-            <p>Creating snippet...</p>
-          ) : createSnippetMutation.isError ? (
-            <p>Error: {createSnippetMutation.error.message}</p>
-          ) : createSnippetMutation.isSuccess ? (
-            <div className="flex flex-col items-center text-center text-xl font-medium text-white">
-              <div className="mt-4 flex flex-row items-center gap-2 rounded-md bg-black pl-2">
-                <Link
-                  href={`/snippet/${createSnippetMutation.data.id}`}
-                  className="font-mono text-lg text-gray-600"
-                >
-                  {`${getBaseUrl()}/snippet/${createSnippetMutation.data.id}`}{" "}
-                </Link>
+            {!hasShared ? (
+              <CTAButton onClick={handleShare} disabled={!value}>
+                Share
+              </CTAButton>
+            ) : createSnippetMutation.isLoading ? (
+              <p>Creating snippet...</p>
+            ) : createSnippetMutation.isError ? (
+              <p>Error: {createSnippetMutation.error.message}</p>
+            ) : createSnippetMutation.isSuccess ? (
+              <div className="flex flex-col items-center text-center text-xl font-medium text-white">
+                <div className="mt-4 flex flex-row items-center gap-2 rounded-md bg-black pl-2">
+                  <Link
+                    href={`/snippet/${createSnippetMutation.data.id}`}
+                    className="font-mono text-lg text-gray-600"
+                  >
+                    {`${getBaseUrl()}/snippet/${createSnippetMutation.data.id}`}{" "}
+                  </Link>
 
-                <div className="flex flex-row items-center gap-1 rounded-md bg-[hsl(280,100%,70%)]/90 px-2 py-1 text-lg font-medium tracking-wide hover:cursor-pointer hover:bg-purple-400">
-                  <TbClipboard
-                    size={24}
-                    onClick={() =>
-                      handleCopy(
-                        `${getBaseUrl()}/snippet/${
-                          createSnippetMutation.data.id
-                        }`
-                      )
-                    }
-                  />
-                  Copy
+                  <div className="flex flex-row items-center gap-1 rounded-md bg-[hsl(280,100%,70%)]/90 px-2 py-1 text-lg font-medium tracking-wide hover:cursor-pointer hover:bg-purple-400">
+                    <TbClipboard
+                      size={24}
+                      onClick={() =>
+                        handleCopy(
+                          `${getBaseUrl()}/snippet/${
+                            createSnippetMutation.data.id
+                          }`
+                        )
+                      }
+                    />
+                    Copy
+                  </div>
                 </div>
+                <span className="mt-4 text-xs text-gray-500">
+                  Made an error?{" "}
+                  <button
+                    className="underline"
+                    onClick={() => handleDelete(createSnippetMutation.data.id)}
+                  >
+                    Delete snippet
+                  </button>
+                </span>
               </div>
-              <span className="mt-4 text-xs text-gray-500">
-                Made an error?{" "}
-                <button
-                  className="underline"
-                  onClick={() => handleDelete(createSnippetMutation.data.id)}
-                >
-                  Delete snippet
-                </button>
-              </span>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
 
           <div className="text-2xl text-white">
             <h3 className="mb-6 text-center text-3xl font-bold text-white ">
               Recent Snippets
             </h3>
-            <div className="container flex flex-col gap-4 text-xs">
+            <div className="container flex flex-col gap-8 text-xs">
               {snippets.data?.map((snippet) => {
                 return (
                   <div key={snippet.id}>
