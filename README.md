@@ -1,4 +1,5 @@
 # Snippy
+![snippy homepage](https://user-images.githubusercontent.com/38955962/211599904-b6c8905c-1449-4d79-a24c-ae90578fc611.png)
 
 This is a code snippet sharing app built with the [T3 Stack](https://create.t3.gg/).
 No need to sign up, just start sharing your code snippets!
