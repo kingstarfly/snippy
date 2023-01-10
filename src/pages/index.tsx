@@ -142,27 +142,35 @@ const Home: NextPage = () => {
             <p className="mb-12 text-center text-sm font-medium text-gray-500 ">
               Last updated {format(snippets.dataUpdatedAt, "HH:mm:ss")}
             </p>
-            <div className="container flex flex-col gap-12 text-xs">
-              {snippets.data?.map((snippet) => {
-                return (
-                  <div key={snippet.id}>
-                    <ReactCodeMirror
-                      value={snippet.code}
-                      editable={false}
-                      width="65vw"
-                      theme={vscodeDark}
-                      extensions={[javascript({ jsx: true })]}
-                      maxHeight="20vh"
-                    />
-                    <span className="align-text-top text-sm font-medium text-gray-400">
-                      Shared{" "}
-                      {formatDistanceToNowStrict(snippet.createdAt, {
-                        addSuffix: true,
-                      })}
-                    </span>
-                  </div>
-                );
-              }) ?? "No snippets so far... :("}
+            <div className="container flex flex-col items-center gap-12 text-xs">
+              {snippets.isLoading ? (
+                <p>Getting snippets...</p>
+              ) : snippets.isError ? (
+                <p>Error: {snippets.error.message}</p>
+              ) : snippets.isSuccess ? (
+                snippets.data?.map((snippet) => {
+                  return (
+                    <div key={snippet.id}>
+                      <ReactCodeMirror
+                        value={snippet.code}
+                        editable={false}
+                        width="65vw"
+                        theme={vscodeDark}
+                        extensions={[javascript({ jsx: true })]}
+                        maxHeight="20vh"
+                      />
+                      <span className="align-text-top text-sm font-medium text-gray-400">
+                        Shared{" "}
+                        {formatDistanceToNowStrict(snippet.createdAt, {
+                          addSuffix: true,
+                        })}
+                      </span>
+                    </div>
+                  );
+                })
+              ) : (
+                <p>No snippets so far... {":("}</p>
+              )}
             </div>
           </div>
         </div>
