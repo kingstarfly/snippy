@@ -1,16 +1,17 @@
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNowStrict } from "date-fns";
 import { NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
 import { useState } from "react";
+import { toast, Toaster } from "react-hot-toast";
 import { TbClipboard } from "react-icons/tb";
 
 import { javascript } from "@codemirror/lang-javascript";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import ReactCodeMirror from "@uiw/react-codemirror";
 
-import { api, getBaseUrl } from "../utils/api";
 import CTAButton from "../components/CTAButton";
+import { api } from "../utils/api";
+import { getFullBaseUrl } from "../utils/link";
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -36,17 +37,27 @@ const Home: NextPage = () => {
   }
 
   function handleCopy(text: string) {
+    console.log("copying to clipboard");
     navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
   }
 
   function handleDelete(id: string) {
     setValue("");
     setHasShared(false);
-    deleteSnippetMutation.mutate({ id });
+    deleteSnippetMutation.mutate(
+      { id },
+      {
+        onSuccess: () => {
+          toast.success("Snippet deleted");
+        },
+      }
+    );
   }
 
   return (
     <>
+      <Toaster />
       <Head>
         <title>Snippy</title>
         <meta name="description" content="Share code snippets" />
@@ -85,26 +96,25 @@ const Home: NextPage = () => {
             ) : createSnippetMutation.isSuccess ? (
               <div className="flex flex-col items-center text-center text-xl font-medium text-white">
                 <div className="mt-4 flex flex-row items-center gap-2 rounded-md bg-black pl-2">
-                  <Link
-                    href={`/snippet/${createSnippetMutation.data.id}`}
-                    className="font-mono text-lg text-gray-600"
-                  >
-                    {`${getBaseUrl()}/snippet/${createSnippetMutation.data.id}`}{" "}
-                  </Link>
+                  <span className="font-mono text-lg text-gray-600">
+                    {`${getFullBaseUrl()}/snippet/${
+                      createSnippetMutation.data.id
+                    }`}
+                  </span>
 
-                  <div className="flex flex-row items-center gap-1 rounded-md bg-[hsl(280,100%,70%)]/90 px-2 py-1 text-lg font-medium tracking-wide hover:cursor-pointer hover:bg-purple-400">
-                    <TbClipboard
-                      size={24}
-                      onClick={() =>
-                        handleCopy(
-                          `${getBaseUrl()}/snippet/${
-                            createSnippetMutation.data.id
-                          }`
-                        )
-                      }
-                    />
+                  <button
+                    onClick={() =>
+                      handleCopy(
+                        `${getFullBaseUrl()}/snippet/${
+                          createSnippetMutation.data.id
+                        }`
+                      )
+                    }
+                    className="flex flex-row items-center gap-1 rounded-md bg-[hsl(280,100%,70%)]/90 px-2 py-1 text-lg font-medium tracking-wide hover:cursor-pointer hover:bg-purple-400"
+                  >
+                    <TbClipboard size={24} />
                     Copy
-                  </div>
+                  </button>
                 </div>
                 <span className="mt-4 text-xs text-gray-500">
                   Made an error?{" "}
@@ -119,11 +129,14 @@ const Home: NextPage = () => {
             ) : null}
           </div>
 
-          <div className="text-2xl text-white">
-            <h3 className="mb-6 text-center text-3xl font-bold text-white ">
+          <div className="mt-32 text-2xl text-white">
+            <h3 className="mb-2 text-center text-3xl font-bold text-white">
               Recent Snippets
             </h3>
-            <div className="container flex flex-col gap-8 text-xs">
+            <p className="mb-12 text-center text-sm font-medium text-gray-500 ">
+              Last updated {format(snippets.dataUpdatedAt, "HH:mm:ss")}
+            </p>
+            <div className="container flex flex-col gap-12 text-xs">
               {snippets.data?.map((snippet) => {
                 return (
                   <div key={snippet.id}>
@@ -137,7 +150,7 @@ const Home: NextPage = () => {
                     />
                     <span className="align-text-top text-sm font-medium text-gray-400">
                       Shared{" "}
-                      {formatDistanceToNow(snippet.createdAt, {
+                      {formatDistanceToNowStrict(snippet.createdAt, {
                         addSuffix: true,
                       })}
                     </span>

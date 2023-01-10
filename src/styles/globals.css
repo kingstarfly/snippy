@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Make all text white by default */
+@layer base {
+    html {
+        @apply text-white
+    }
+}
