@@ -147,7 +147,9 @@ const Home: NextPage = () => {
                 <p>Getting snippets...</p>
               ) : snippets.isError ? (
                 <p>Error: {snippets.error.message}</p>
-              ) : snippets.isSuccess ? (
+              ) : snippets.data.length === 0 ? (
+                <p>No snippets so far... {":("}</p>
+              ) : (
                 snippets.data?.map((snippet) => {
                   return (
                     <div key={snippet.id}>
@@ -168,8 +170,6 @@ const Home: NextPage = () => {
                     </div>
                   );
                 })
-              ) : (
-                <p>No snippets so far... {":("}</p>
               )}
             </div>
           </div>
