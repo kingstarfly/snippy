@@ -1,5 +1,4 @@
 import { format, formatDistanceToNowStrict } from "date-fns";
-import { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
@@ -13,21 +12,21 @@ import CTAButton from "../components/CTAButton";
 import { api } from "../utils/api";
 import { getFullBaseUrl } from "../utils/link";
 
+import type { NextPage } from "next";
 const Home: NextPage = () => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const snippets = api.snippet.getTopThree.useQuery();
   const [value, setValue] = useState<string>("");
   const [hasShared, setHasShared] = useState(false);
 
   const apiContext = api.useContext();
   const createSnippetMutation = api.snippet.create.useMutation({
-    onSuccess() {
-      apiContext.snippet.getTopThree.invalidate();
+    async onSuccess() {
+      await apiContext.snippet.getTopThree.invalidate();
     },
   });
   const deleteSnippetMutation = api.snippet.delete.useMutation({
-    onSuccess() {
-      apiContext.snippet.getTopThree.invalidate();
+    async onSuccess() {
+      await apiContext.snippet.getTopThree.invalidate();
     },
   });
 
@@ -38,8 +37,15 @@ const Home: NextPage = () => {
 
   function handleCopy(text: string) {
     console.log("copying to clipboard");
-    navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard");
+
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        toast.success("Copied to clipboard");
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
   }
 
   function handleDelete(id: string) {
@@ -103,13 +109,13 @@ const Home: NextPage = () => {
                   </span>
 
                   <button
-                    onClick={() =>
+                    onClick={() => {
                       handleCopy(
                         `${getFullBaseUrl()}/snippet/${
                           createSnippetMutation.data.id
                         }`
-                      )
-                    }
+                      );
+                    }}
                     className="flex flex-row items-center gap-1 rounded-md bg-[hsl(280,100%,70%)]/90 px-2 py-1 text-lg font-medium tracking-wide hover:cursor-pointer hover:bg-purple-400"
                   >
                     <TbClipboard size={24} />

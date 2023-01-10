@@ -40,7 +40,7 @@ export default function Snippet() {
           ) : (
             <div className="container flex flex-col items-center justify-center gap-12 px-4 pt-8 pb-16">
               <h2 className="text-4xl font-bold tracking-tight text-white sm:text-[4rem]">
-                Here's the snippet
+                Here&apos;s the snippet
               </h2>
               <ReactCodeMirror
                 value={snippetQuery.data?.code}
