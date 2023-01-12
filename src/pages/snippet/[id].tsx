@@ -1,8 +1,14 @@
 // Dynamic route for snippet page
 
+import {
+  GetStaticPaths,
+  GetStaticPathsContext,
+  GetStaticProps,
+  GetStaticPropsContext,
+  InferGetStaticPropsType,
+} from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 import { javascript } from "@codemirror/lang-javascript";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
@@ -11,10 +17,17 @@ import ReactCodeMirror from "@uiw/react-codemirror";
 import CTAButton from "../../components/CTAButton";
 import { api } from "../../utils/api";
 
-export default function Snippet() {
-  const router = useRouter();
-  const { id } = router.query;
+import type { Snippet as SnippetModel } from "@prisma/client";
+import { createProxySSGHelpers } from "@trpc/react-query/ssg";
+import superjson from "superjson";
+import { appRouter } from "../../server/api/root";
+import { createInnerTRPCContext } from "../../server/api/trpc";
 
+// TODO: Make sure that ISR changes work since these dynamic routes should now be statically rendered at request time and then cached.
+// TODO: When deleting a snippet, do on-demand revalidation / purge the cached page.
+export default function Snippet({
+  id,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   const snippetQuery = api.snippet.get.useQuery({ id: id as string });
 
   return (
@@ -59,3 +72,34 @@ export default function Snippet() {
     </>
   );
 }
+
+type PathParams = { id: string };
+
+export const getStaticPaths: GetStaticPaths<PathParams> = async () => {
+  return {
+    paths: [], // empty paths to not pre-render any pages via SSG. Idea is to use ISR to only generate snippet pages on user's request and then cache them
+    fallback: "blocking",
+  };
+};
+
+export const getStaticProps = async ({
+  params,
+}: GetStaticPropsContext<{ id: string }>) => {
+  const ssg = await createProxySSGHelpers({
+    router: appRouter,
+    ctx: await createInnerTRPCContext({}),
+    transformer: superjson, // optional - adds superjson serialization
+  });
+
+  const id = params?.id as string;
+
+  const snippetQuery = ssg.snippet.get.prefetch({ id: id });
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+      id,
+    },
+    revalidate: false, // Do not automatically revalidate. Instead, opt to do on-demand revalidation.
+  };
+};
