@@ -10,7 +10,7 @@ import ReactCodeMirror from "@uiw/react-codemirror";
 
 import CTAButton from "../components/CTAButton";
 import { api } from "../utils/api";
-import { getFullBaseUrl } from "../utils/link";
+import { getFullBaseUrl } from "../utils/snippet";
 
 import type { NextPage } from "next";
 const Home: NextPage = () => {
@@ -66,7 +66,15 @@ const Home: NextPage = () => {
       <Toaster />
       <Head>
         <title>Snippy</title>
-        <meta name="description" content="Share code snippets" />
+        <meta name="description" content="Share your code snippets" />
+
+        <meta property="og:url" content={getFullBaseUrl()} />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Snippy" />
+        <meta name="twitter:card" content="summary" />
+        <meta property="og:description" content="Share your code snippets" />
+        <meta property="og:image" content="/og-image.png" />
+
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-b from-[#2e026d] to-[#15162c]">
