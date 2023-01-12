@@ -2,8 +2,6 @@
 
 import {
   GetStaticPaths,
-  GetStaticPathsContext,
-  GetStaticProps,
   GetStaticPropsContext,
   InferGetStaticPropsType,
 } from "next";
@@ -17,7 +15,6 @@ import ReactCodeMirror from "@uiw/react-codemirror";
 import CTAButton from "../../components/CTAButton";
 import { api } from "../../utils/api";
 
-import type { Snippet as SnippetModel } from "@prisma/client";
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import superjson from "superjson";
 import { appRouter } from "../../server/api/root";
@@ -28,7 +25,7 @@ import { createInnerTRPCContext } from "../../server/api/trpc";
 export default function Snippet({
   id,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const snippetQuery = api.snippet.get.useQuery({ id: id as string });
+  const snippetQuery = api.snippet.get.useQuery({ id: id });
 
   return (
     <>
@@ -75,7 +72,7 @@ export default function Snippet({
 
 type PathParams = { id: string };
 
-export const getStaticPaths: GetStaticPaths<PathParams> = async () => {
+export const getStaticPaths: GetStaticPaths<PathParams> = () => {
   return {
     paths: [], // empty paths to not pre-render any pages via SSG. Idea is to use ISR to only generate snippet pages on user's request and then cache them
     fallback: "blocking",
@@ -85,15 +82,16 @@ export const getStaticPaths: GetStaticPaths<PathParams> = async () => {
 export const getStaticProps = async ({
   params,
 }: GetStaticPropsContext<{ id: string }>) => {
-  const ssg = await createProxySSGHelpers({
+  const ssg = createProxySSGHelpers({
     router: appRouter,
-    ctx: await createInnerTRPCContext({}),
+    ctx: createInnerTRPCContext({}),
     transformer: superjson, // optional - adds superjson serialization
   });
 
   const id = params?.id as string;
 
-  const snippetQuery = ssg.snippet.get.prefetch({ id: id });
+  // pre-fetch `snippet.get`
+  await ssg.snippet.get.prefetch({ id: id });
 
   return {
     props: {
