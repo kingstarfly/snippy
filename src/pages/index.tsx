@@ -4,7 +4,14 @@ import { useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { TbClipboard } from "react-icons/tb";
 
+import { css } from "@codemirror/lang-css";
+import { java } from "@codemirror/lang-java";
 import { javascript } from "@codemirror/lang-javascript";
+import { json } from "@codemirror/lang-json";
+import { markdown } from "@codemirror/lang-markdown";
+import { python } from "@codemirror/lang-python";
+import { rust } from "@codemirror/lang-rust";
+import { sql } from "@codemirror/lang-sql";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import ReactCodeMirror from "@uiw/react-codemirror";
 
@@ -93,7 +100,16 @@ const Home: NextPage = () => {
               onChange={setValue}
               width="85vw"
               theme={vscodeDark}
-              extensions={[javascript({ jsx: true, typescript: true })]}
+              extensions={[
+                javascript({ jsx: true, typescript: true }),
+                python(),
+                java(),
+                json(),
+                rust(),
+                sql(),
+                markdown(),
+                css(),
+              ]}
               placeholder="// ---Paste your code here!---"
               editable={!hasShared}
             />
@@ -167,7 +183,16 @@ const Home: NextPage = () => {
                         editable={false}
                         width="65vw"
                         theme={vscodeDark}
-                        extensions={[javascript({ jsx: true })]}
+                        extensions={[
+                          javascript({ jsx: true, typescript: true }),
+                          python(),
+                          java(),
+                          json(),
+                          rust(),
+                          sql(),
+                          markdown(),
+                          css(),
+                        ]}
                         maxHeight="20vh"
                       />
                       <span className="align-text-top text-sm font-medium text-gray-400">

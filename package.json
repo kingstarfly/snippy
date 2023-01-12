@@ -10,7 +10,14 @@
     "start": "next start"
   },
   "dependencies": {
+    "@codemirror/lang-css": "^6.0.1",
+    "@codemirror/lang-java": "^6.0.1",
     "@codemirror/lang-javascript": "^6.1.2",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-markdown": "^6.0.5",
+    "@codemirror/lang-python": "^6.1.1",
+    "@codemirror/lang-rust": "^6.0.1",
+    "@codemirror/lang-sql": "^6.3.3",
     "@codemirror/view": "^6.7.2",
     "@prisma/client": "^4.8.0",
     "@tanstack/react-query": "^4.20.0",

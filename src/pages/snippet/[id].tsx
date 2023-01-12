@@ -7,21 +7,25 @@ import {
 } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import superjson from "superjson";
 
+import { css } from "@codemirror/lang-css";
+import { java } from "@codemirror/lang-java";
 import { javascript } from "@codemirror/lang-javascript";
+import { json } from "@codemirror/lang-json";
+import { markdown } from "@codemirror/lang-markdown";
+import { python } from "@codemirror/lang-python";
+import { rust } from "@codemirror/lang-rust";
+import { sql } from "@codemirror/lang-sql";
+import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import ReactCodeMirror from "@uiw/react-codemirror";
 
 import CTAButton from "../../components/CTAButton";
-import { api } from "../../utils/api";
-
-import { createProxySSGHelpers } from "@trpc/react-query/ssg";
-import superjson from "superjson";
 import { appRouter } from "../../server/api/root";
 import { createInnerTRPCContext } from "../../server/api/trpc";
+import { api } from "../../utils/api";
 
-// TODO: Make sure that ISR changes work since these dynamic routes should now be statically rendered at request time and then cached.
-// TODO: When deleting a snippet, do on-demand revalidation / purge the cached page.
 export default function Snippet({
   id,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
@@ -57,7 +61,16 @@ export default function Snippet({
                 editable={false}
                 width="65vw"
                 theme={vscodeDark}
-                extensions={[javascript({ jsx: true })]}
+                extensions={[
+                  javascript({ jsx: true, typescript: true }),
+                  python(),
+                  java(),
+                  json(),
+                  rust(),
+                  sql(),
+                  markdown(),
+                  css(),
+                ]}
               />
               <CTAButton>
                 <Link href="/">Create a New Snippet</Link>
