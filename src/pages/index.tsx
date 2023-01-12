@@ -10,9 +10,10 @@ import ReactCodeMirror from "@uiw/react-codemirror";
 
 import CTAButton from "../components/CTAButton";
 import { api } from "../utils/api";
-import { getFullBaseUrl } from "../utils/snippet";
+import { getFullBaseUrl, shortenUrl } from "../utils/snippet";
 
 import type { NextPage } from "next";
+
 const Home: NextPage = () => {
   const snippets = api.snippet.getTopThree.useQuery();
   const [value, setValue] = useState<string>("");
@@ -36,8 +37,6 @@ const Home: NextPage = () => {
   }
 
   function handleCopy(text: string) {
-    console.log("copying to clipboard");
-
     navigator.clipboard
       .writeText(text)
       .then(() => {
@@ -94,7 +93,7 @@ const Home: NextPage = () => {
               onChange={setValue}
               width="85vw"
               theme={vscodeDark}
-              extensions={[javascript({ jsx: true })]}
+              extensions={[javascript({ jsx: true, typescript: true })]}
               placeholder="// ---Paste your code here!---"
               editable={!hasShared}
             />
@@ -111,9 +110,11 @@ const Home: NextPage = () => {
               <div className="flex flex-col items-center text-center text-xl font-medium text-white">
                 <div className="mt-4 flex flex-row items-center gap-2 rounded-md bg-black pl-2">
                   <span className="font-mono text-lg text-gray-600">
-                    {`${getFullBaseUrl()}/snippet/${
-                      createSnippetMutation.data.id
-                    }`}
+                    {shortenUrl(
+                      `${getFullBaseUrl()}/snippet/${
+                        createSnippetMutation.data.id
+                      }`
+                    )}
                   </span>
 
                   <button
