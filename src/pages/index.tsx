@@ -172,40 +172,50 @@ const Home: NextPage = () => {
                 <p>Getting snippets...</p>
               ) : snippets.isError ? (
                 <p>Error: {snippets.error.message}</p>
-              ) : snippets.data.length === 0 ? (
+              ) : snippets.data.totalSnippets === 0 ? (
                 <p>No snippets so far... {":("}</p>
               ) : (
-                snippets.data?.map((snippet) => {
-                  return (
-                    <div key={snippet.id}>
-                      <ReactCodeMirror
-                        value={snippet.code}
-                        editable={false}
-                        width="65vw"
-                        theme={vscodeDark}
-                        extensions={[
-                          javascript({ jsx: true, typescript: true }),
-                          python(),
-                          java(),
-                          json(),
-                          rust(),
-                          sql(),
-                          markdown(),
-                          css(),
-                        ]}
-                        maxHeight="20vh"
-                      />
-                      <span className="align-text-top text-sm font-medium text-gray-400">
-                        Shared{" "}
-                        {formatDistanceToNowStrict(snippet.createdAt, {
-                          addSuffix: true,
-                        })}
-                      </span>
-                    </div>
-                  );
-                })
+                <>
+                  <div>
+                    {snippets.data?.topThreeSnippets.map((snippet) => {
+                      return (
+                        <div key={snippet.id}>
+                          <ReactCodeMirror
+                            value={snippet.code}
+                            editable={false}
+                            width="65vw"
+                            theme={vscodeDark}
+                            extensions={[
+                              javascript({ jsx: true, typescript: true }),
+                              python(),
+                              java(),
+                              json(),
+                              rust(),
+                              sql(),
+                              markdown(),
+                              css(),
+                            ]}
+                            maxHeight="20vh"
+                          />
+                          <span className="align-text-top text-sm font-medium text-gray-400">
+                            Shared{" "}
+                            {formatDistanceToNowStrict(snippet.createdAt, {
+                              addSuffix: true,
+                            })}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {snippets.data.totalSnippets > 3 && (
+                    <h3 className="mb-2 text-center text-2xl font-bold text-white">
+                      And {snippets.data.totalSnippets - 3} more...
+                    </h3>
+                  )}
+                </>
               )}
             </div>
+            {/* If snippets data length is more than 3 */}
           </div>
         </div>
       </main>

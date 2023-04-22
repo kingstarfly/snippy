@@ -12,14 +12,21 @@ export const snippetRouter = createTRPCRouter({
         },
       });
     }),
-  getTopThree: publicProcedure.query(({ ctx }) => {
-    // Use prisma to find the most recent three snippets
-    return ctx.prisma.snippet.findMany({
+  getTopThree: publicProcedure.query(async ({ ctx }) => {
+    // Use prisma to find the most recent three snippets, and also total number of snippets
+
+    const topThreeSnippets = await ctx.prisma.snippet.findMany({
       orderBy: {
         createdAt: "desc",
       },
       take: 3,
     });
+
+    const totalSnippets = await ctx.prisma.snippet.count();
+    return {
+      topThreeSnippets,
+      totalSnippets,
+    };
   }),
   create: publicProcedure
     .input(
